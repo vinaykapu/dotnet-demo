@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Project Board</title>
+  <link rel="stylesheet" href="/css/app.css" />
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <rect width="28" height="28" rx="8" fill="#6366f1"/>
+          <rect x="6" y="8" width="6" height="12" rx="2" fill="white" opacity="0.9"/>
+          <rect x="15" y="6" width="6" height="7" rx="2" fill="white"/>
+          <rect x="15" y="16" width="6" height="6" rx="2" fill="white" opacity="0.6"/>
+        </svg>
+        <span class="logo-text">ProjectBoard</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <button class="nav-item active" onclick="showView('board')" id="nav-board">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Board
+      </button>
+      <button class="nav-item" onclick="showView('projects')" id="nav-projects">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+        Projects
+      </button>
+      <button class="nav-item" onclick="showView('stats')" id="nav-stats">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Stats
+      </button>
+    </nav>
+
+    <div class="sidebar-projects" id="sidebar-projects"></div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+
+    <!-- Board view -->
+    <div id="view-board" class="view active">
+      <div class="page-header">
+        <div>
+          <h1 id="board-title">All Projects</h1>
+          <p class="page-subtitle" id="board-subtitle">Drag tasks across columns to update status</p>
+        </div>
+        <div class="header-actions">
+          <select class="select" id="project-filter" onchange="filterByProject(this.value)">
+            <option value="">All projects</option>
+          </select>
+          <button class="btn btn-primary" onclick="openTaskModal()">+ New Task</button>
+        </div>
+      </div>
+
+      <div class="kanban" id="kanban">
+        <div class="column" id="col-todo" ondragover="onDragOver(event)" ondrop="onDrop(event,'Todo')">
+          <div class="column-header">
+            <span class="column-title">To Do</span>
+            <span class="column-count badge badge-gray" id="count-todo">0</span>
+          </div>
+          <div class="column-cards" id="cards-todo"></div>
+        </div>
+        <div class="column" id="col-inprogress" ondragover="onDragOver(event)" ondrop="onDrop(event,'InProgress')">
+          <div class="column-header">
+            <span class="column-title">In Progress</span>
+            <span class="column-count badge badge-blue" id="count-inprogress">0</span>
+          </div>
+          <div class="column-cards" id="cards-inprogress"></div>
+        </div>
+        <div class="column" id="col-done" ondragover="onDragOver(event)" ondrop="onDrop(event,'Done')">
+          <div class="column-header">
+            <span class="column-title">Done</span>
+            <span class="column-count badge badge-green" id="count-done">0</span>
+          </div>
+          <div class="column-cards" id="cards-done"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Projects view -->
+    <div id="view-projects" class="view">
+      <div class="page-header">
+        <div>
+          <h1>Projects</h1>
+          <p class="page-subtitle">Manage your projects</p>
+        </div>
+        <button class="btn btn-primary" onclick="openProjectModal()">+ New Project</button>
+      </div>
+      <div class="projects-grid" id="projects-grid"></div>
+    </div>
+
+    <!-- Stats view -->
+    <div id="view-stats" class="view">
+      <div class="page-header">
+        <div>
+          <h1>Stats</h1>
+          <p class="page-subtitle">Overview across all projects</p>
+        </div>
+      </div>
+      <div class="stats-grid" id="stats-grid"></div>
+    </div>
+
+  </main>
+
+  <!-- Task Modal -->
+  <div class="modal-backdrop" id="task-modal" onclick="closeModal('task-modal')">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h2 id="task-modal-title">New Task</h2>
+        <button class="modal-close" onclick="closeModal('task-modal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Title *</label>
+          <input class="input" id="task-title" placeholder="What needs to be done?" />
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea class="input textarea" id="task-desc" placeholder="Add details..."></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Project *</label>
+            <select class="select input" id="task-project"></select>
+          </div>
+          <div class="form-group">
+            <label>Priority</label>
+            <select class="select input" id="task-priority">
+              <option value="0">Low</option>
+              <option value="1" selected>Medium</option>
+              <option value="2">High</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Assignee</label>
+          <input class="input" id="task-assignee" placeholder="Who's on it?" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('task-modal')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveTask()">Create Task</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Project Modal -->
+  <div class="modal-backdrop" id="project-modal" onclick="closeModal('project-modal')">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h2>New Project</h2>
+        <button class="modal-close" onclick="closeModal('project-modal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Name *</label>
+          <input class="input" id="proj-name" placeholder="Project name" />
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <input class="input" id="proj-desc" placeholder="What's this project about?" />
+        </div>
+        <div class="form-group">
+          <label>Colour</label>
+          <div class="color-swatches" id="color-swatches"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('project-modal')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveProject()">Create Project</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script src="/js/app.js"></script>
+</body>
+</html>
