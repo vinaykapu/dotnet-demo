@@ -11,17 +11,9 @@ var app = builder.Build();
 
 app.UseSwagger();
 app.UseSwaggerUI();
-app.UseStaticFiles();
 app.UseDefaultFiles();
+app.UseStaticFiles();
 
-// ── API info ─────────────────────────────────────────────────────────────────
-app.MapGet("/api", () => Results.Ok(new
-{
-    app = "Project Board API",
-    version = "2.0.0",
-    ui = "/",
-    docs = "/swagger",
-}));
 
 app.MapGet("/health", () => Results.Ok(new
 {
