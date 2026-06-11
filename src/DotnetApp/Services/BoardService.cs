@@ -7,7 +7,7 @@ public class BoardService
 {
     private List<Project> _projects = new()
     {
-        new Project { Id = 1, Name = "Website Redesign", Description = "Modernise the company website", Color = "#6366f1" },
+        new Project { Id = 1, Name = "Website Redesign1", Description = "Modernise the company website", Color = "#6366f1" },
         new Project { Id = 2, Name = "Mobile App", Description = "iOS and Android launch", Color = "#f59e0b" },
         new Project { Id = 3, Name = "API Gateway", Description = "Centralised API management layer", Color = "#10b981" },
     };
